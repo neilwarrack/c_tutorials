@@ -2,6 +2,7 @@
 
 # back up files from emacs 
 *~
+*#
 
 # executables
 *.sh
