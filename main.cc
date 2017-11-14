@@ -1,8 +1,10 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include "planets.h"
 #include <vector>
 #include <fstream>
+#include "datafileprocess.h"
 using namespace std;
 
 int main (){
@@ -26,13 +28,24 @@ int main (){
     return 1;
   }
 
-
+  //   count lines in file
+  int lines = lineCounter(mydata);
+  cout << "lines = " << lines << endl;
+  
   vector<Planet> planets;
   // read from file, compute magnitudes and write to file
   Planet x ;
+  string name;
+  double mass;
+  double distance;
+  
   while ( !mydata.eof() ){
-    mydata >> x.setName() >> x.setMass() >> x.setDist();
-    planets.push_back(x);
+  mydata >> name >> mass >> distance ;
+  x.setName(name);
+  x.setMass(mass);
+  x.setDist(distance);
+  planets.push_back(x);
+  }
    
  /*    if ( !mydata.eof() ) {
       line++;
@@ -43,10 +56,12 @@ int main (){
       myfile << x << " " << y << " " << r << endl ;
     }
     */
-  }
-
-  cout << "v[1] = " << v[1] << endl;
-
-
+    
+ for (int i=0; i<lines; i++){
+   cout << "planets[" << i << "].getName = " << planets[i].getName() << endl;
+   cout << "planets[" << i << "].getMass = " << planets[i].getMass() << endl;
+   cout << "planets[" << i << "].getDist = " << planets[i].getDist() << endl;
+   }
+  mydata.close();
   return 0;
 }
