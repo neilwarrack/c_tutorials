@@ -1,0 +1,38 @@
+
+ - Planets in alphabetical order:
+	1) Earth
+	2) Jupiter
+	3) Mars
+	4) Mercury
+	5) Neptune
+	6) Saturn
+	7) Uranus
+	8) Venus
+
+ - Planets in order of increasing mass:
+	1) Mercury (3.3022e+23 kg)
+	2) Mars (6.4185e+23 kg)
+	3) Venus (4.8685e+24 kg)
+	4) Earth (5.9736e+24 kg)
+	5) Uranus (8.681e+25 kg)
+	6) Neptune (1.0243e+26 kg)
+	7) Saturn (5.6846e+26 kg)
+	8) Jupiter (1.8986e+27 kg)
+
+
+ - Planets in order of increasing distance from the sun:
+	1) Mercury (0.387 AU)
+	2) Venus (0.722 AU)
+	3) Earth (1 AU)
+	4) Mars (1.52 AU)
+	5) Jupiter (5.2 AU)
+	6) Saturn (9.58 AU)
+	7) Uranus (19.2 AU)
+	8) Neptune (30.1 AU)
+
+ - Mercury is the planet with smallest mass.
+ - Jupiter is the planet with largest mass.
+ - Mercury is the planet with smallest distance from the sun.
+ - Neptune is the planet with largest distance from the sun.
+ - The (mass) weighted average distance to a planet is: 7.52556 AU.
+
