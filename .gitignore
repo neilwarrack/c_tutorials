@@ -1,8 +1,8 @@
 # gitignore
 
-# back up files from emacs 
 *~
 *#
-
-# executables
 *.sh
+*.zip
+.DS_store
+a.out
