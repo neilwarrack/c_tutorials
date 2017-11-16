@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include "planets.h"
 #include <vector>
 #include <fstream>
+#include "planets.h"
 #include "datafileprocess.h"
-#include <algorithm>
+
 
 using namespace std;
 
@@ -106,7 +106,7 @@ int main (){
     //computed weighted distance
     double tot_mass = 0;
     double tot_wMass = 0;
-    for (auto planetX : planets ){
+    for (Planet planetX : planets ){
       tot_wMass += (planetX.getDist()*planetX.getMass());
       tot_mass += planetX.getMass();}
 
