@@ -1,0 +1,28 @@
+0. Create the Hello World example given in the first lecture. Compile and run your program.
+
+1. Declare two variables, x and y, and assign them the values x=2.3 and y=4.5. Assuming these are x and y components of a 2-D vector, compute the magnitude of the vector and have your program print the answer to the screen.
+
+What you will learn: Data types, creating and assigning variables, cout. 
+
+2. Now create a function to calculate the magnitude of the vector which takes as input the x and y components. Think about the return type you would like your function to have. Use this function to calculate the magnitude of the vector in part 1 and make sure the answer which is printed out is the same. Test for different values of x and y, including negative values.
+
+What you will learn: creating a function. 
+
+3(a) Read the file input2D_float.txt and for each line print the value from the first column (x value) and second column (y value) and the magnitude of the vector. 
+
+3(b) Write to a new file called output2D_float.txt containing three columns for each entry of the initial file: the first two columns being x and y and the third being the newly computed magnitude. 
+
+What you will learn: reading from a file, writing to a file. 
+
+4. Repeat question 3 but using the input file input3D_float.txt, which has three values, the coordinates x, y, z. 
+
+What you will learn: For this you could build another function with another name. However, instead you can (and it is best practice to) build another function with the same name, which takes three arguments instead. The fact that you are allowed to have functions with the same name while the compiler knows they are different because they have different input arguments is called overloading. 
+
+5. Repeat question 3 but instead of using decimal numbers of type float, use integer numbers of type unsigned. Use input2D_int.txt and input3D_int.txt for this.
+
+What you will learn: It might be tempting to copy and paste the code from above, and replace float with int, but this is not good practice. What happens when you want to modify one function? Then you would have to modify the other one too. This is quite inefficient and can be error prone. Instead, build a function that can take as arguments either one type of variable (float), or the other (int). This is called templating.
+
+6. Now we want to do the same thing for one of the input files, but instead of looping over all the four lines in the file, we want the user to provide the number of lines to consider (eg. 2) as a command line argument. If the user gives a number of lines smaller than 0, then the program should print an error and then close. If the user gives a number larger than the number of lines, it should print a warning and not crash, but simply go through all the lines and print a warning just before the end.
+
+What you learn from this: how to pass command line arguments. 
+
