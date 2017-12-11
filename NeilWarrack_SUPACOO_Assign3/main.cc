@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <cmath>
 #include <vector>
 #include <fstream>
 #include "planets.h"
@@ -26,6 +27,10 @@ int main (int argc, char *argv[] ){
   // convert user defined argument to doubles
   const float dt = atof(argv[1]) ;
   const float total_time = atof(argv[2]) ;
+  const int days = 86400 ; // time in seconds
+  const double G = 6.674e-11 ; 
+  const int steps = total_time*days/(dt*days) ;
+  cout << "steps = " << steps ;
 
   ifstream mydata;
   // Now open an existing input file...
@@ -36,9 +41,10 @@ int main (int argc, char *argv[] ){
     return 1;
   }
 
+  /*
   //   count lines in file
   int lines = lineCounter(mydata);
-
+  */
   
   vector<Planet> planets ;
   Planet planet ;
@@ -69,21 +75,108 @@ int main (int argc, char *argv[] ){
     if (planet.GetMass() == 0.0 ) { cout << "ERROR: no mass!" ; return 1;} 
   }
 
-  cout << planets[3].GetYV0() << " <- GetYV0 for planet " << planets[3].GetName() 
-       << "before evolution." << endl ;
-  planets[3].EvolveY(dt, total_time) ;
-  cout << planets[3].GetYV0() << " <- GetYV0 for planet " << planets[3].GetName() 
-       << "after evolution." << endl ;
+  double a = 0.0 ;
+  double a_x = 0.0 ;
+  double sum_a_x = 0.0 ;
+  double a_y = 0.0 ; 
+  double sum_a_y = 0.0 ; 
+  double rsqrd = 0.0 ;
+  double hypot = 0.0 ;
 
+  // PRINT OUT
+  /*
+  for ( Planet& k : planets ){  
+    cout << "Before evolution:" << endl ;
+    cout << k.GetX0()  << " <- GetX0 for "  << k.GetName() << endl ; 
+    cout << k.GetXV0() << " <- GetXV0 for " << k.GetName() << endl ; 
+    cout << k.GetY0()  << " <- GetY0 for "  << k.GetName() << endl ; 
+    cout << k.GetYV0() << " <- GetYV0 for " << k.GetName() << endl ; 
+  }
+  */
+  cout << planets[5].GetName() << " is at coord:" << endl ;
+  cout << "(" << planets[5].GetX0() << "," << planets[5].GetY0() << ")" << endl ; 
+  for (int i = 1 ; i < steps ; i++){
+
+
+  // compute accelerations and store in planet objects
+  for (Planet& p : planets ) {
+    //cout << "+++++ " << p.GetName() << " +++++" << endl ;
+
+  sum_a_x = 0.0 ; // reset sum!
+  sum_a_y = 0.0 ; // reset sum!
+
+  for ( Planet& q : planets ){ 
+    if ( &p == &q ) {
+      //      cout << "<<<----- remove itself from sum." << endl;
+      continue ;}
+    //cout << "adding planet q = " << q.GetName() << endl ;
+    //cout << "p.GetX0() = " << p.GetX0() << " q.GetX0() = " << q.GetX0() << endl ;
+    //cout << "p.GetX0() - q.GetX0() = " << p.GetX0() - q.GetX0() << endl ;
+    //cout << (p.GetX0() - q.GetX0() )*(p.GetX0() - q.GetX0() ) << endl ;
+    //cout << "q.GetMass() = " << q.GetMass() << endl ;
+    rsqrd = (p.GetX0() - q.GetX0() )*(p.GetX0() - q.GetX0() ) + (p.GetY0() - q.GetY0() )*(p.GetY0() - q.GetY0() ) ;
+    //cout << "rsqrd = " << rsqrd << endl ;
+
+    // Calculate acceleration of p due to q.   
+    hypot = sqrt(rsqrd) ;
+    //cout << "hypot = " << hypot << endl ;
+    //cout << "G = " << G << endl ;
+    //cout << "q.getMass = " << q.GetMass() << endl ;
+    //cout << "rsqrd = " << rsqrd << endl ; 
+    a = G*(q.GetMass()/rsqrd) ;
+    //cout << "a = " << a << endl ;
+    a_x = a*(p.GetX0() - q.GetX0() )/hypot ;
+    //cout << "a_x = " << a_x << endl ; 
+    a_y = a*(p.GetY0() - q.GetY0() )/hypot ;
+    
+    //cout << "  sum_a_x = " << sum_a_x << endl;
+    sum_a_x = sum_a_x + a_x ;
+    //cout << "  UPDATED: sum_a_x = " << sum_a_x << endl;
+
+    //cout << "  sum_a_y = " << sum_a_y << endl;
+    sum_a_y = sum_a_y + a_y ;
+    //cout << "  UPDATED: sum_a_y = " << sum_a_y << endl;
+      
+}
+
+  //cout << "++++++++++++++++++ ALL ADDED! FINAL RESULTS: ++++++++++++++++++++++" << endl ;
+  //cout << "    tot sum_a_x = " << sum_a_x << endl ;
+  //cout << "    tot sum_a_y = " << sum_a_y << endl ;
+  p.SetXA0(sum_a_x);
+  p.SetYA0(sum_a_y);
+  //cout << "p.getXA0() = " << p.GetXA0() << endl ;
+  //cout << "p.getYA0() = " << p.GetYA0() << endl ;
+  //cout << p.GetName() << " DONE!!!!!!!!!!!!!!!!!!!" << endl << endl ;
+  }
+
+  // Evolve system.
+  // Compute number of steps.
+
+  for ( Planet& s : planets ){
+    s.EvolveX(dt) ;
+    s.EvolveY(dt) ;
+  }
+cout << "                             acc(" << planets[5].GetXA0() << "," << planets[5].GetYA0() << ")" << endl ; 
+cout << "pos(" << planets[5].GetX0() << "," << planets[5].GetY0() << ")" << endl ; 
+//  cout << "step: " << i ;
+  }
+  //______________________________________________
+  // PRINT OUT
+  cout << "AFTER evolution:" << endl ;
+  for (Planet& t : planets){  
+    //  cout << t.GetX0()  << " <- GetX0 for "  << t.GetName() << endl ; 
+    //cout << t.GetXV0() << " <- GetXV0 for " << t.GetName() << endl ; 
+    //cout << t.GetY0()  << " <- GetY0 for "  << t.GetName() << endl ; 
+  }
 
   // ++++++++++++++ SORT BY ALPHABET +++++++++++++++++++
-  
+  /*
   sort( planets.begin(), planets.end(), SortByName );
   cout << "\n - Planets in alphabetical order:\n";   
   for ( int j = 0; j < lines ; j++){
     cout << "\t" << j+1 << ") " << planets[j].GetName() << endl ;
   }
-  
+  */
 
   // ++++++++++++++ SORT BY MASS ++++++++++++++++++++++++
   /*
