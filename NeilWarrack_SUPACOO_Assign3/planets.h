@@ -20,6 +20,7 @@ class Planet
   double GetYV0() ;
   double GetXA0() ;
   double GetYA0() ;
+  int GetIndex() ;
 
   void SetName(string n) ;
   void SetMass(double m) ;
@@ -29,6 +30,7 @@ class Planet
   void SetYV0(double yv0) ;
   void SetXA0(double xa0) ;
   void SetYA0(double ya0) ;
+  void SetIndex(int index) ;
 
   // Evolve functions
   void EvolveX(float dt) ;
@@ -47,7 +49,7 @@ class Planet
   double m_yv0 ;
   double m_xa0 ;
   double m_ya0 ;
-
+  int m_index ;
 };
 
 #endif
