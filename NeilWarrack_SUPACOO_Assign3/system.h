@@ -1,22 +1,25 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include <string>
 #include "planets.h"
 
 using namespace std ;
 
-class System : public Planet {
+class System : public Planet 
+{
 
-public:
+ public:
+
 
   System() ;
-  System( vector<Planet> planets ) ;
-
-  // Evolve function
-  void EvolveSystem(float dt) ;
-
+  System( const vector<Planet>& planets ) ;
+  vector<Planet> GetPlanets() ;
+  void IndexSolarSystem() ; 
+  void EvolveSystem( double dt, int planetcode, int varcode ) ;
  private:
   vector<Planet> m_system ;
+  Planet m_planet1 ;
 };
  
 #endif

@@ -6,7 +6,14 @@
 
 using namespace std;
 
-Planet::Planet() {
+
+
+Planet::Planet() 
+  : Planet("unnamed", 0, 0, 0, 0, 0, 0, 0)
+{    }
+
+/*
+{
   m_name = "unnamed" ;
   m_mass = 0.0 ;
   m_x0 = 0.0 ;
@@ -18,7 +25,9 @@ Planet::Planet() {
   m_index = 0 ;
 }
 
-Planet::Planet(string n, double m, double x0, double y0, double xv0, double yv0){
+
+Planet::Planet(string n, double m, double x0, 
+               double y0, double xv0, double yv0) {
   m_name = n ;
   m_mass = m ;
   m_x0 = x0 ;
@@ -29,8 +38,10 @@ Planet::Planet(string n, double m, double x0, double y0, double xv0, double yv0)
   m_ya0 = 0.0 ;
   m_index = 0 ;
 }
+*/
 
-Planet::Planet(string n, double m, double x0, double y0, double xv0, double yv0, double xa0, double ya0){
+Planet::Planet(string n, double m, double x0, double y0, 
+               double xv0, double yv0, double xa0, double ya0) {
   m_name = n ;
   m_mass = m ;
   m_x0 = x0 ;
@@ -42,16 +53,18 @@ Planet::Planet(string n, double m, double x0, double y0, double xv0, double yv0,
   m_index = 0 ;
 }
 
+/*
 // Define getter functions
-string Planet::GetName() { return m_name ; }
-double Planet::GetMass() { return m_mass ; }
-double Planet::GetX0() { return m_x0 ; }
-double Planet::GetY0() { return m_y0 ; }
-double Planet::GetXV0() { return m_xv0 ; }
-double Planet::GetYV0() { return m_yv0 ; }
-double Planet::GetXA0() { return m_xa0 ; }
-double Planet::GetYA0() { return m_ya0 ; }
-int Planet::GetIndex() { return m_index ; }
+string Planet::GetName() const  { return m_name ; }
+double Planet::GetMass() const { return m_mass ; }
+double Planet::GetX0() const { return m_x0 ; }
+double Planet::GetY0() const { return m_y0 ; }
+double Planet::GetXV0() const { return m_xv0 ; }
+double Planet::GetYV0() const { return m_yv0 ; }
+double Planet::GetXA0() const { return m_xa0 ; }
+double Planet::GetYA0() const { return m_ya0 ; }
+int Planet::GetIndex() const { return m_index ; }
+*/
 
 // Define setter functions
 void Planet::SetName(string n) { m_name = n ; }
@@ -64,24 +77,19 @@ void Planet::SetXA0(double xa0) { m_xa0 = xa0 ; }
 void Planet::SetYA0(double ya0) { m_ya0 = ya0 ; }
 void Planet::SetIndex(int index) { m_index = index ; }
 
+
 // Define evolotion functions
-void Planet::EvolveX(float dt) {
-  m_x0 = m_x0 + m_xv0*dt + 1/2*m_xa0*dt*dt ;
-  m_xv0 = m_xv0 + m_xa0*dt ;
+void Planet::EvolveX(double dt) {
+  //  cout << "prior: " << m_x0 << endl; 
+  SetX0(m_x0 + m_xv0*dt + 1/2*m_xa0*dt*dt) ;
+  SetXV0(m_xv0 + m_xa0*dt) ;
+  SetXA0(0) ;
+  //cout << "after: " << m_x0 << endl; 
 } 
 
-void Planet::EvolveX(float dt, double a) {
-  m_x0 = m_x0 + m_xv0*dt + 1/2*a*dt*dt ;
-  m_xv0 = m_xv0 + a*dt ;
+void Planet::EvolveY(double dt) {
+  SetY0(m_y0 + m_yv0*dt + 1/2*m_ya0*dt*dt) ;
+  SetYV0(m_yv0 = m_yv0 + m_ya0*dt) ;
+  SetYA0(0) ;
 } 
 
-
-void Planet::EvolveY(float dt) {
-  m_y0 = m_y0 + m_yv0*dt + 1/2*m_ya0*dt*dt ;
-  m_yv0 = m_yv0 + m_ya0*dt ;
-} 
-
-void Planet::EvolveY(float dt, double a) {
-  m_y0 = m_y0 + m_yv0*dt + 1/2*a*dt*dt ;
-  m_yv0 = m_yv0 + a*dt ;
-} 

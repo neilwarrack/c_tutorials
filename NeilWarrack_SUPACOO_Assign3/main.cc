@@ -1,3 +1,5 @@
+//* N. Warrack
+
 // * * * * * * * *  * *  * * *  * * * *  * * * * * * * * * * * * * *  * * * * 
 // argv[4] = varcodes
 // 
@@ -25,7 +27,7 @@ using namespace std;
 int main (int argc, char *argv[] ){
   // Return error if no or incorrect arguments are passed at command line.
   if (argc != 5) {
-    cout << "ERROR: You must run this program with two arguments of type float\n"
+    cout << "ERROR: You must run this program with two arguments of type double\n"
          << "The first argument specifies in days the time interval over which\n"
          << "evolutionary acceleration may be considered constant. The second\n"
          << "argument specifies in days the total tim eof evolution required\n"
@@ -35,25 +37,12 @@ int main (int argc, char *argv[] ){
          << "recalculated every half day." << endl;
     return 1; }
 
-  // Read code arguments
-  const int planetcode = atoi(argv[3]) ;
-  cout << "planet code: " << planetcode << endl ;
-  const int varcode = atoi(argv[4]) ;
-  cout << "variable code: " << varcode << endl ;
 
-  // read command line arguments (convert to floats)
-  const float dt = atof(argv[1]) ;
-  const float total_time = atof(argv[2]) ;
-  const int days = 86400 ; // time in seconds
-  const double G = 6.674e-11 ; // Gravitational constant
-  const int steps = total_time*days/(dt*days) ;
 
-  // Print to screen user-defined time parameters.
-  cout << "steps = " << steps << endl ;
-  cout << "dt in seconds: "<< dt << "x" << days << "sec = " << dt*days 
-       << "sec." << endl ;
-  cout << "total_time in seconds: "<< total_time << "x" << days 
-       << "sec = " << dt*days << "sec." << endl ;
+  // read command line arguments (convert to doubles)
+  const double dt = atof(argv[1]) ;
+  const double total_time = atof(argv[2]) ;
+  const int steps = total_time/dt ;
 
 
   // Open an existing input file 
@@ -64,232 +53,148 @@ int main (int argc, char *argv[] ){
          << "-- It does not exisit in this location!" << endl ;
     return 1 ;
   }
+  // create output files
+  ofstream f_earth;
+  ofstream f_moon;
+  ofstream f_sun ;
+  ofstream f_mercury ;
+  ofstream f_venus ;
+  ofstream f_mars ;
+  ofstream f_jupiter ;
+  ofstream f_saturn ;
+  ofstream f_uranus ;
+  ofstream f_neptune ;
 
-  /*
-  //   count lines in file
-  int lines = lineCounter(mydata);
-  */
-  
-  vector<Planet> planets ;
-  Planet planet ;
+
+
+  // Fill vector of <Planet>s from file
+
   string name = "empty" ;
   double mass = 0.0 ;
   double x0 = 0.0 ;
   double y0 = 0.0 ;
   double xv0 = 0.0 ;
   double yv0 = 0.0 ;
+  vector<Planet> planets ;
 
-  // Fill vector of <Planet>s from file
   while ( mydata.good() ){
 
     mydata >> name >> mass >> x0 >> y0 >> xv0 >> yv0  ;
     if( mydata.eof() ) break ;
-    planet.SetName( name ) ;
-    planet.SetMass( mass ) ;
-    planet.SetX0( x0 ) ;
-    planet.SetY0( y0 ) ;
-    planet.SetXV0( xv0 ) ;
-    planet.SetYV0( yv0 ) ;
-
-    // Test setter and getter functions
-    if (planet.GetName() == "empty") { 
+    Planet planet(name, mass, x0, y0, xv0, yv0);
+   
+    if (planet.GetName() == "empty") {     // Test getter functions
       cout << "ERROR: vector not filled during while loop" ; 
       return 1; 
     }
+    
     planets.push_back( planet ) ;
+    cout << " - push_back success for: " << planet.GetName() << endl ;
   }
 
+  // Read code arguments
+  const int planetcode = atoi(argv[3]) ;
+  //  cout << "planet code: " << planetcode << endl ;
+  const int varcode = atoi(argv[4]) ;
+  cout << "variable code: " ;
+  if (varcode == 1) cout << "X position" << endl ;
+  if (varcode == 2) cout << "Y position" << endl ;
+  if (varcode == 3) cout << "X velocity" << endl ;
+  if (varcode == 4) cout << "Y velocity" << endl ;
+  if (varcode == 5) cout << "X acceleration" << endl ;
+  if (varcode == 6) cout << "Y acceleration" << endl ;
+
+ 
   // index planets according to readme1.txt
+  System system (planets) ;
+  system.IndexSolarSystem() ;
 
-    for (Planet& n : planets ) {
-      //      cout << "mass: "<< n.GetMass() << endl;
-      if (n.GetMass() == 5.9736e+24 ) {n.SetIndex(1) ;}// cout << "Earth indexed: "   << n.GetIndex() ;}
-      if (n.GetMass() == 7.3477e+22 ) {n.SetIndex(2) ;}// cout << "Moon indexed: "    << n.GetIndex() ;}
-      if (n.GetMass() == 1.9890e+30 ) {n.SetIndex(3) ;}// cout << "Sun indexed: "     << n.GetIndex() ;}
-      if (n.GetMass() == 3.3022e+23 ) {n.SetIndex(4) ;}// cout << "Mercury indexed: " << n.GetIndex() ;}
-      if (n.GetMass() == 4.8685e+24 ) {n.SetIndex(5) ;}// cout << "Venus indexed: "   << n.GetIndex() ;}
-      if (n.GetMass() == 6.4185e+23 ) {n.SetIndex(6) ;}// cout << "Mars indexed: "    << n.GetIndex() ;}
-      if (n.GetMass() == 1.8986e+27 ) {n.SetIndex(7) ;}// cout << "Jupiter indexed: " << n.GetIndex() ;}
-      if (n.GetMass() == 5.6846e+26 ) {n.SetIndex(8) ;}// cout << "Saturn indexed: "  << n.GetIndex() ;}
-      if (n.GetMass() == 8.6810e+25 ) {n.SetIndex(9) ;}// cout << "Uranus indexed: "  << n.GetIndex() ;}
-      if (n.GetMass() == 1.0243e+26 ) {n.SetIndex(0) ;}// cout << "Neptune indexed: " << n.GetIndex() ;}
-    
-}
-
-  // initialize variables for calculating accelerations
-  double a = 0.0 ;
-  double a_x = 0.0 ;
-  double sum_a_x = 0.0 ;
-  double a_y = 0.0 ; 
-  double sum_a_y = 0.0 ; 
-  double rsqrd = 0.0 ;
-  double hypot = 0.0 ;
-
-  // PRINT OUT
-  /*
-  for ( Planet& k : planets ){  
-    cout << "Before evolution:" << endl ;
-    cout << k.GetX0()  << " <- GetX0 for "  << k.GetName() << endl ; 
-    cout << k.GetXV0() << " <- GetXV0 for " << k.GetName() << endl ; 
-    cout << k.GetY0()  << " <- GetY0 for "  << k.GetName() << endl ; 
-    cout << k.GetYV0() << " <- GetYV0 for " << k.GetName() << endl ; 
+ 
+  for (Planet& n : system.GetPlanets() ){
+    // cout << planetcode << n.GetIndex() << endl ;
+     if ( planetcode == n.GetIndex() ){
+      if (planetcode == 1 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 2 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 3 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 4 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 5 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 6 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 7 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 8 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 9 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;
+      if (planetcode == 0 ) cout << "PLANETCODE: " << planetcode << "=" << n.GetName() << endl ;    
+     }
   }
+  cout << endl ;
   
-  cout << planets[5].GetName() << " is at coord:" << endl ;
-  cout << "(" << planets[5].GetX0() << "," << planets[5].GetY0() << ")" << endl ; 
-  */
-
+  
+  f_earth.open ("out_earth.txt");
+  f_moon.open ("out_moon.txt");  
+  f_sun.open ("out_sun.txt");
+  f_mercury.open ("out_mercury.txt");  
+  f_venus.open ("out_venus.txt");  
+  f_mars.open ("out_mars.txt"); 
+  f_jupiter.open ("out_jupiter.txt");  
+  f_saturn.open ("out_saturn.txt");
+  f_uranus.open ("out_uranus.txt");  
+  f_neptune.open ("out_neptune.txt");    
+  
+  
+  // evolve system
   for (int i = 1 ; i <= steps ; i++){
-    // Calculate acceleration of p due to q.   
-    for (Planet& p : planets ) {
-
-      if ( sum_a_x != 0.0 ) sum_a_x = 0.0 ; // reset sum!
-      if ( sum_a_y != 0.0 ) sum_a_y = 0.0 ; // reset sum!
-
-      for ( Planet& q : planets ){ 
-        if ( &p == &q ) {
-          //        cout << p.GetName() << "<- removed from force calculation with " 
-          //     << q.GetName() << endl;
-          continue ;}
-        //cout << "adding planet q = " << q.GetName() << endl ;
-        //cout << "p.GetX0() = " << p.GetX0() << " q.GetX0() = " << q.GetX0() << endl ;
-        //cout << "p.GetX0() - q.GetX0() = " << p.GetX0() - q.GetX0() << endl ;
-        //cout << (p.GetX0() - q.GetX0() )*(p.GetX0() - q.GetX0() ) << endl ;
-        //cout << "q.GetMass() = " << q.GetMass() << endl ;
-        rsqrd = (p.GetX0() - q.GetX0() )*(p.GetX0() - q.GetX0() ) + (p.GetY0() - q.GetY0() )*(p.GetY0() - q.GetY0() ) ;
-        //cout << "rsqrd = " << rsqrd << endl ;
-        
-        
-        hypot = sqrt(rsqrd) ;
-        //cout << "hypot = " << hypot << endl ;
-        //cout << "G = " << G << endl ;
-        //cout << "q.getMass = " << q.GetMass() << endl ;
-        //cout << "rsqrd = " << rsqrd << endl ; 
-        a = -G*(q.GetMass()/rsqrd) ;
-        //cout << "a = " << a << endl ;
-        a_x = a*(p.GetX0() - q.GetX0() )/hypot ;
-        //cout << "a_x = " << a_x << endl ; 
-        a_y = a*(p.GetY0() - q.GetY0() )/hypot ;
-        
-        //cout << "  sum_a_x = " << sum_a_x << endl;
-        sum_a_x = sum_a_x + a_x ;
-        //cout << "  UPDATED: sum_a_x = " << sum_a_x << endl;
-        
-        //cout << "  sum_a_y = " << sum_a_y << endl;
-        sum_a_y = sum_a_y + a_y ;
-        //cout << "  UPDATED: sum_a_y = " << sum_a_y << endl;
-        
-      }
-      
-      //cout << "++++++++++++++++++ ALL ADDED! FINAL RESULTS: ++++++++++++++++++++++" << endl ;
-      //cout << "    tot sum_a_x = " << sum_a_x << endl ;
-      //cout << "    tot sum_a_y = " << sum_a_y << endl ;
-      p.SetXA0(sum_a_x);
-      p.SetYA0(sum_a_y);
-      
-      if ( planetcode == p.GetIndex() ) {
-        if (varcode == 1 ) cout << p.GetX0() << endl ;
-        if (varcode == 2 ) cout << p.GetY0() << endl ;
-        if (varcode == 3 ) cout << p.GetXV0() << endl ;
-        if (varcode == 4 ) cout << p.GetYV0() << endl ;
-        if (varcode == 5 ) cout << p.GetXA0() << endl ;
-        if (varcode == 6 ) cout << p.GetYA0() << endl ;
-        
-      }
-      
-      //cout << "p.getXA0() = " << p.GetXA0() << endl ;
-      //cout << "p.getYA0() = " << p.GetYA0() << endl ;
-      //cout << p.GetName() << " DONE!!!!!!!!!!!!!!!!!!!" << endl << endl ;
-    }
     
-    // Evolve system.
-    for ( Planet& s : planets ){
-      s.EvolveX(dt*days) ;
-      s.EvolveY(dt*days) ;
+  
+  for (Planet& n : system.GetPlanets() ){
+
+    if (n.GetIndex() == 1){
+      f_earth << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    
-    //  cout << "                             acc(" << planets[5].GetXA0() << "," << planets[5].GetYA0() << ")" << endl ; 
-    //cout << "pos(" << planets[5].GetX0() << "," << planets[5].GetY0() << ")" << endl ; 
-    //  cout << "step: " << i ;
+    if (n.GetIndex() == 2){
+      f_moon  << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 2){
+      f_sun << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 3){
+      f_mercury << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 4){
+      f_venus << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 5){
+      f_mars << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 6){
+      f_jupiter << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 7){
+      f_saturn << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 8){
+      f_uranus << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+    if (n.GetIndex() == 9){
+      f_neptune << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
+    }
+  system.EvolveSystem( dt, planetcode, varcode ) ; 
   }
-  //______________________________________________
-  // PRINT OUT
-  //  cout << "FINAL RESULTS" << endl ;
-  //for (Planet& t : planets){  
-  //  cout << " Planet: " << t.GetName() << endl;
-  //  cout << "  Position: (" << t.GetX0()  << "," << t.GetY0() << ")\n" ;
-  //  cout << "  Velocity: (" << t.GetXV0()  << "," << t.GetYV0() << ")\n" ;
-  //  cout << "  Accel.:   (" << t.GetXA0()  << "," << t.GetYA0() << ")\n" ;
-
-    //cout << t.GetXV0() << " <- GetXV0 for " << t.GetName() << endl ; 
-    //cout << t.GetY0()  << " <- GetY0 for "  << t.GetName() << endl ; }
-
-  // ++++++++++++++ SORT BY ALPHABET +++++++++++++++++++
-  /*
-  sort( planets.begin(), planets.end(), SortByName );
-  cout << "\n - Planets in alphabetical order:\n";   
-  for ( int j = 0; j < lines ; j++){
-    cout << "\t" << j+1 << ") " << planets[j].GetName() << endl ;
   }
-  */
-
-  // ++++++++++++++ SORT BY MASS ++++++++++++++++++++++++
-  /*
-  sort( planets.begin(), planets.end(), sortByMass ); 
-  cout << "\n - Planets in order of increasing mass:\n";    
-  for ( int k = 0; k < lines; k++){
-    cout << "\t" << k+1 << ") " << planets[k].getName() << " (" <<  planets[k].getMass() 
-	 << " kg)\n" ;
-  }
-  */
 
 
-  // Identify most and least massive planets
-  /*
-  string mass_max = planets[lines - 1].getName() ;
-  string mass_min = planets[0].getName() ;
-  */
-
-  // ++++++++++++++ SORT BY DISTANCE ++++++++++++++++++++
-  /*
-  sort( planets.begin(), planets.end(), sortByDist ); 
-  cout << "\n - Planets in order of increasing distance from the sun:\n";    
- for ( int l = 0; l < lines; l++){
-   cout << "\t" << l+1 << ") " << planets[l].getName() << " (" <<  planets[l].getDist() 
-	<< " AU)\n" ;
-  }
-  */
-
-  // Identify most and least distant (from sun) planets
-  /*
-  string dist_max = planets[lines - 1].getName() ;
-  string dist_min = planets[0].getName() ;
-  */
-
-  // Print the planet with the smallest and largest mass. Same for distance to the sun.
-  /* 
-  cout << " - " << mass_min << " is the planet with smallest mass." << endl ;
-  cout << " - " << mass_max << " is the planet with largest mass." << endl ;
-  cout << " - " << dist_min << " is the planet with smallest distance from the sun." << endl ;
-  cout << " - " << dist_max << " is the planet with largest distance from the sun." << endl ;
-  */
-
-    //computed weighted distance
-  /*
-    double tot_mass = 0;
-    double tot_wMass = 0;
-    for (Planet planetX : planets ){
-      tot_wMass += (planetX.getDist()*planetX.getMass());
-      tot_mass += planetX.getMass();}
-
-
-    cout << " - The (mass) weighted average distance to a planet is: " 
-	 << tot_wMass/tot_mass << " AU.\n" << endl ;
-  */
-
-
+  f_earth.close() ;  
+  f_moon.close() ;
+  f_sun.close() ;
+  f_mercury.close() ;  
+  f_venus.close() ;
+  f_mars.close() ; 
+  f_jupiter.close() ; 
+  f_saturn.close() ; 
+  f_uranus.close() ;
+  f_neptune.close() ;  
+  
   // Close data file
   mydata.close();
-  
+
+
   return 0;
-}
+  }
