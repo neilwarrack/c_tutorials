@@ -8,8 +8,7 @@
 #include <fstream>
 #include "planets.h"
 #include "system.h"
-//#include "datafileprocess.h"
-#include "planettools.h"
+#include "datafileprocess.h"
 
 using namespace std;
 
@@ -20,24 +19,18 @@ int main (int argc, char *argv[] ){
     cout << "ERROR: You must run this program with two arguments of type double\n"
          << "The first argument specifies in days the time interval over which\n"
          << "evolutionary acceleration may be considered constant. The second\n"
-         << "argument specifies in days the total tim eof evolution required\n"
-         << "$ ./thisScript.sh 0.5 365\n"
+         << "argument specifies in days the total time of evolution required\n"
+         << "$ ./thisScript 0.5 365\n"
          << "will calculate the evolution of the system over a year acording to\n"
          << "the assumption that the 'constant' acceleration of each body be\n"
          << "recalculated every half day." << endl;
     return 1; }
 
 
-
   // read command line arguments (convert to doubles)
-  const double dt = atof(argv[1]) ;
-  //  cout << "dt = " << dt << " days" << endl ;
-
+  const static double dt = atof(argv[1]) ;
   const double total_time = atof(argv[2]) ;
-  //cout << "total time = " << total_time << " days" << endl ;
-
   const int steps = total_time/dt ;
-  //cout << "steps required = " << steps << endl ;
 
 
   // Open an existing input file 
@@ -102,53 +95,48 @@ int main (int argc, char *argv[] ){
   f_uranus.open ("out_uranus.txt");  
   f_neptune.open ("out_neptune.txt");    
   
-  int planetCtr = 0 ;
+  
   // evolve system
   for (int i = 1 ; i <= steps ; i++){
     
-    // print info to file  
+  
   for (Planet& n : system.GetPlanets() ){
-    planetCtr++;
-    if (planetCtr == 6){
+
+    if (n.GetIndex() == 1){
       f_earth << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 7){
+    if (n.GetIndex() == 2){
       f_moon  << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 10){
+    if (n.GetIndex() == 2){
       f_sun << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 4){
+    if (n.GetIndex() == 3){
       f_mercury << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 9){
+    if (n.GetIndex() == 4){
       f_venus << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 2){
+    if (n.GetIndex() == 5){
       f_mars << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 3){
+    if (n.GetIndex() == 6){
       f_jupiter << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 5){
+    if (n.GetIndex() == 7){
       f_saturn << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 8){
+    if (n.GetIndex() == 8){
       f_uranus << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-    if (planetCtr == 1){
+    if (n.GetIndex() == 9){
       f_neptune << i << " " << i*dt << "days " << n.GetX0() << " " << n.GetY0() << endl ;
     }
-  }
-  
-  
-  // Evolve system
   system.EvolveSystem( dt ) ; 
-  planetCtr = 0 ;  // reset ctr
-    }
-  
-  
-  // Close files
+  }
+  }
+
+
   f_earth.close() ;  
   f_moon.close() ;
   f_sun.close() ;
@@ -159,85 +147,76 @@ int main (int argc, char *argv[] ){
   f_saturn.close() ; 
   f_uranus.close() ;
   f_neptune.close() ;  
-  mydata.close() ; // (data)
 
-
-
-
-  //___________________________
+  //__________________________________________________________________
 
 
   string n_time = "empty" ;
-  int n_step = 0 ;
+  int n_step = 0 ;   
   double x = 0.0 ;
   double y = 0.0 ;
   double previous_x = 5.0e15 ;
-  int line_counter = 1 ;
+  int line_counter = 1 ;  
   bool orbitCalculated = false ;
-
+  
   for (int g = 1 ; g < planets.size(); g++){
-    ifstream a;
-    if (g==1){
-      a.open("out_earth.txt");
-      cout << "Earth ";}
-    if (g==2){
-      a.open("out_moon.txt");
-      cout << "moon " ;}
-    if (g==3) {continue ;}    // ignore sun    
-    if (g==4){
-      a.open("out_mercury.txt");
-      cout << "Mercury ";}
-    if (g==5){
-      a.open("out_venus.txt");
-      cout << "Venus " ;}
-    if (g==6){
-      a.open("out_mars.txt");
-      cout << "Mars " ;}
-    if (g==7){
-      a.open("out_jupiter.txt");
-      cout << "Jupiter " ;}
-    if (g==8){
-      a.open("out_saturn.txt");
-      cout << "Saturn " ;}
-    if (g==9){
-      a.open("out_uranus.txt");
-      cout << "Uranus " ;}
-    if (g==0){
-      a.open("out_neptune.txt");
-      cout << "Neptune " ;}
-
-    if ( a.fail() ) {
-      cout << "ERROR: Sorry, couldn’t open out_{planet}.txt "
-           << "-- It does not exisit in this location!" << endl ;
-    }
-    while ( a.good() ){
-      if (orbitCalculated) break ;
-      a >> n_step >> n_time >> x >> y ;
-
-      if ( line_counter == 1 ) previous_x = 5e15 ;
-      if ((previous_x-x) < 0 ){
-        cout << "time of orbit = ~" << n_step*2*dt << " days." << endl ;
-        orbitCalculated = true ;
-      }
-
-      previous_x = x ;
-      line_counter++ ;
-    }
-      if( a.eof() ) {
-        //a >> n_step >> n_time >> x >> y ;
-        cout << "time of orbit longer than " << line_counter*2*dt ;
-        cout << " (try longer duration than " << total_time << " days)" << endl ; 
-        //orbitCalculated = true ;       
-        //break ;
-      }
-
-    line_counter = 1 ;        // reset line_counter
-    orbitCalculated = false ; // reset orbit calculated flag
-    a.close() ;               // close file
+  ifstream a;
+  if (g==1){ 
+    a.open("out_earth.txt");
+    cout << "Earth: " << endl ;}
+  if (g==2){ 
+    a.open("out_moon.txt");
+    cout << "moon: " << endl ;}
+  if (g==3){ 
+    a.open("out_sun.txt");
+    cout << "Sun: " << endl ;}
+  if (g==4){ 
+    a.open("out_mercury.txt");
+    cout << "Mercury: " << endl ;}
+  if (g==5){ 
+    a.open("out_venus.txt");
+    cout << "Venus: " << endl ;}
+  if (g==6){ 
+    a.open("out_mars.txt");
+    cout << "Mars: " << endl ;}
+  if (g==7){ 
+    a.open("out_jupiter.txt");
+    cout << "Jupiter: " << endl ;}
+  if (g==8){ 
+    a.open("out_saturn.txt");
+    cout << "Saturn: " << endl ;}
+  if (g==9){ 
+    a.open("out_uranus.txt");
+    cout << "Uranus: " << endl ;}
+  if (g==0){ 
+    a.open("out_neptune.txt");
+    cout << "Neptune: " << endl ;}
+  
+  if ( a.fail() ) {
+    cout << "ERROR: Sorry, couldn’t open out_{planet}.txt "
+         << "-- It does not exisit in this location!" << endl ;
+  }
+  while ( a.good() ){
+      if( a.eof() ) break ; 
+   if (orbitCalculated) break ;
+   a >> n_step >> n_time >> x >> y ;
+   
+   if ( line_counter == 1 ) previous_x = 5e15 ;
+   if ((previous_x-x) < 0 ){
+     cout << "time of orbit = " << n_step*2*dt << " days." << endl ;
+     orbitCalculated = true ;
+   }
+   
+   previous_x = x ;
+   line_counter++ ;
+  }
+ 
+  line_counter = 1 ;        // reset line_counter
+  orbitCalculated = false ; // reset orbit calculated flag
+  a.close() ;               // close file
 
   }
-  // _________________________________
-
-
+  
   return 0;
+
 }

@@ -16,7 +16,7 @@ class System : public Planet
   System( const vector<Planet>& planets ) ;
   vector<Planet> GetPlanets() ;
   void IndexSolarSystem() ; 
-  void EvolveSystem( double dt, int planetcode, int varcode ) ;
+  void EvolveSystem( double dt) ;
  private:
   vector<Planet> m_system ;
   Planet m_planet1 ;

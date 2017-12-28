@@ -12,33 +12,6 @@ Planet::Planet()
   : Planet("unnamed", 0, 0, 0, 0, 0, 0, 0)
 {    }
 
-/*
-{
-  m_name = "unnamed" ;
-  m_mass = 0.0 ;
-  m_x0 = 0.0 ;
-  m_y0 = 0.0 ;
-  m_xv0 = 0.0 ;
-  m_yv0 = 0.0 ;
-  m_xa0 = 0.0 ;
-  m_ya0 = 0.0 ;
-  m_index = 0 ;
-}
-
-
-Planet::Planet(string n, double m, double x0, 
-               double y0, double xv0, double yv0) {
-  m_name = n ;
-  m_mass = m ;
-  m_x0 = x0 ;
-  m_y0 = y0 ;
-  m_xv0= xv0 ;
-  m_yv0 = yv0 ;
-  m_xa0 = 0.0 ;
-  m_ya0 = 0.0 ;
-  m_index = 0 ;
-}
-*/
 
 Planet::Planet(string n, double m, double x0, double y0, 
                double xv0, double yv0, double xa0, double ya0) {
@@ -79,17 +52,27 @@ void Planet::SetIndex(int index) { m_index = index ; }
 
 
 // Define evolotion functions
-void Planet::EvolveX(double dt) {
+void Planet::EvolveX(double t) {
   //  cout << "prior: " << m_x0 << endl; 
-  SetX0(m_x0 + m_xv0*dt + 1/2*m_xa0*dt*dt) ;
-  SetXV0(m_xv0 + m_xa0*dt) ;
+  double x = 0 ;
+  double xv = 0 ;
+
+  x = m_x0 + m_xv0*t + (m_xa0*t*t)/2 ;
+  xv = m_xv0 + m_xa0*t ;
+  SetX0(x) ;
+  SetXV0(xv) ;
   SetXA0(0) ;
   //cout << "after: " << m_x0 << endl; 
 } 
 
-void Planet::EvolveY(double dt) {
-  SetY0(m_y0 + m_yv0*dt + 1/2*m_ya0*dt*dt) ;
-  SetYV0(m_yv0 = m_yv0 + m_ya0*dt) ;
+void Planet::EvolveY(double t) {
+  double y = 0 ;
+  double yv = 0 ;
+
+  y = m_y0 + m_yv0*t + (m_ya0*t*t)/2 ;
+  yv = m_yv0 + m_ya0*t ;
+  SetY0(y) ;
+  SetYV0(yv) ;
   SetYA0(0) ;
 } 
 
